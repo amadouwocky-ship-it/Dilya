@@ -124,7 +124,7 @@ export function CheckoutForm() {
                           return normalizedValue.includes(normalizedSearch) ? 1 : 0
                         }}
                       >
-                        <CommandInput placeholder="Rechercher un pays..." />
+                        <CommandInput placeholder="Rechercher un pays..." autoFocus={false} />
                         <CommandList>
                           <CommandEmpty>Aucun pays trouvé.</CommandEmpty>
                           <CommandGroup>
