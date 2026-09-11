@@ -115,6 +115,7 @@ export function CheckoutForm() {
                       className="w-[--radix-popover-trigger-width] p-0" 
                       align="start"
                       onCloseAutoFocus={(e) => e.preventDefault()}
+                      onOpenAutoFocus={(e) => e.preventDefault()}
                     >
                       <Command
                         filter={(value, search) => {
