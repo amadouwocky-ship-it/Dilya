@@ -39,7 +39,7 @@ export function CheckoutForm() {
   const router = useRouter()
   const [selectedCountry, setSelectedCountry] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [paymentMethod, setPaymentMethod] = useState('Espèces à la livraison')
+  const [paymentMethod, setPaymentMethod] = useState('Wave')
   const { subtotal, items, clear } = useCart()
   
   const [formData, setFormData] = useState({
@@ -131,17 +131,6 @@ export function CheckoutForm() {
                   </p>
                   
                   <div className="flex flex-col gap-3">
-                    <label className="flex items-center gap-3 rounded-lg border p-3 cursor-pointer hover:bg-muted/50 transition-colors">
-                      <input 
-                        type="radio" 
-                        name="paymentMethod" 
-                        value="Espèces à la livraison" 
-                        checked={paymentMethod === 'Espèces à la livraison'}
-                        onChange={(e) => setPaymentMethod(e.target.value)}
-                        className="w-4 h-4 text-primary"
-                      />
-                      <span className="font-medium">Paiement en espèces à la livraison</span>
-                    </label>
                     <label className="flex items-center gap-3 rounded-lg border p-3 cursor-pointer hover:bg-muted/50 transition-colors">
                       <input 
                         type="radio" 
