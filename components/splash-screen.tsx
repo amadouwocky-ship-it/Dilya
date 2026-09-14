@@ -86,7 +86,7 @@ export function SplashScreen() {
               Fermer
             </Button>
             <Button onClick={() => {
-              window.open("https://wa.me/221770000000", "_blank")
+              window.open("https://wa.me/221774772051", "_blank")
               setShowAlert(false)
             }} className="bg-green-500 hover:bg-green-600 text-white">
               Contacter sur WhatsApp
