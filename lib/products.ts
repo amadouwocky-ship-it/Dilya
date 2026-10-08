@@ -74,8 +74,9 @@ const productInclude = {
 }
 
 export async function getProduct(slug: string): Promise<Product | undefined> {
+  const decodedSlug = decodeURIComponent(slug)
   const p = await prisma.product.findUnique({
-    where: { slug },
+    where: { slug: decodedSlug },
     include: productInclude,
   })
   return p ? mapProduct(p) : undefined
