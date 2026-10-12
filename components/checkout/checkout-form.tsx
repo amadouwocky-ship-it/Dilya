@@ -131,29 +131,45 @@ export function CheckoutForm() {
                   </p>
                   
                   <div className="flex flex-col gap-3">
-                    <label className="flex items-center gap-3 rounded-lg border p-3 cursor-pointer hover:bg-muted/50 transition-colors">
-                      <input 
-                        type="radio" 
-                        name="paymentMethod" 
-                        value="Wave" 
-                        checked={paymentMethod === 'Wave'}
-                        onChange={(e) => setPaymentMethod(e.target.value)}
-                        className="w-4 h-4 text-[#1dc3f5]"
-                      />
-                      <Image src="/wave.jpg" alt="Wave" width={24} height={24} className="rounded-[4px] object-cover" />
-                      <span className="font-medium">Wave</span>
+                    <label className={`flex items-center justify-between rounded-lg border p-3.5 cursor-pointer transition-colors ${paymentMethod === 'Wave' ? 'border-[#1dc3f5] bg-[#1dc3f5]/5 ring-1 ring-[#1dc3f5]' : 'hover:bg-muted/50'}`}>
+                      <div className="flex items-center gap-3">
+                        <input 
+                          type="radio" 
+                          name="paymentMethod" 
+                          value="Wave" 
+                          checked={paymentMethod === 'Wave'}
+                          onChange={(e) => setPaymentMethod(e.target.value)}
+                          className="w-4 h-4 text-[#1dc3f5]"
+                        />
+                        <Image src="/wave.jpg" alt="Wave" width={28} height={28} className="rounded-md object-cover" />
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-sm">Wave Business</span>
+                            <span className="text-[10px] bg-[#1dc3f5]/15 text-[#0284c7] dark:text-[#38bdf8] px-2 py-0.5 rounded-full font-semibold">Paiement direct</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            Redirection immédiate vers le lien officiel Wave
+                          </p>
+                        </div>
+                      </div>
                     </label>
-                    <label className="flex items-center gap-3 rounded-lg border p-3 cursor-pointer hover:bg-muted/50 transition-colors">
-                      <input 
-                        type="radio" 
-                        name="paymentMethod" 
-                        value="Orange Money" 
-                        checked={paymentMethod === 'Orange Money'}
-                        onChange={(e) => setPaymentMethod(e.target.value)}
-                        className="w-4 h-4 text-[#f16e00]"
-                      />
-                      <Image src="/orange-money.png" alt="Orange Money" width={24} height={24} className="rounded-[4px] object-cover" />
-                      <span className="font-medium">Orange Money</span>
+
+                    <label className={`flex items-center justify-between rounded-lg border p-3.5 cursor-pointer transition-colors ${paymentMethod === 'Orange Money' ? 'border-[#f16e00] bg-[#f16e00]/5 ring-1 ring-[#f16e00]' : 'hover:bg-muted/50'}`}>
+                      <div className="flex items-center gap-3">
+                        <input 
+                          type="radio" 
+                          name="paymentMethod" 
+                          value="Orange Money" 
+                          checked={paymentMethod === 'Orange Money'}
+                          onChange={(e) => setPaymentMethod(e.target.value)}
+                          className="w-4 h-4 text-[#f16e00]"
+                        />
+                        <Image src="/orange-money.png" alt="Orange Money" width={28} height={28} className="rounded-md object-cover" />
+                        <div>
+                          <span className="font-medium text-sm">Orange Money</span>
+                          <p className="text-xs text-muted-foreground mt-0.5">Paiement mobile sécurisé</p>
+                        </div>
+                      </div>
                     </label>
                   </div>
                 </div>
@@ -187,13 +203,18 @@ export function CheckoutForm() {
                     }
 
                     clear()
-                    toast.success("Commande confirmée avec succès !")
-                    router.push('/')
+                    toast.success("Commande enregistrée avec succès !")
+
+                    if (paymentMethod === 'Wave') {
+                      window.location.href = 'https://pay.wave.com/m/M_sn_jgLTJQDWgtBq/c/sn/'
+                    } else {
+                      router.push('/')
+                    }
                   }}
                   disabled={isSubmitting}
                 >
                   {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Confirmer la commande
+                  {paymentMethod === 'Wave' ? 'Confirmer et payer avec Wave' : 'Confirmer la commande'}
                 </Button>
               </div>
             </div>
