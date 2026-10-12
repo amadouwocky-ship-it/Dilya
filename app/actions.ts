@@ -305,30 +305,29 @@ export async function createOrder(data: any) {
       if (order.email) {
         let paymentInstruction = ''
         if (paymentMethod === 'Wave') {
-          paymentInstruction = `<p style="color: #0284c7; font-weight: bold;">Paiement via Wave Business : Votre commande est en attente et sera validée dès réception effective de votre règlement (${order.subtotal} FCFA). Si ce n'est pas déjà fait, <a href="https://pay.wave.com/m/M_sn_jgLTJQDWgtBq/c/sn/" target="_blank" style="color: #0284c7; text-decoration: underline;">cliquez ici pour payer sur Wave Business</a>.</p>`
+          paymentInstruction = `<p style="color: #1dc3f5; font-weight: bold;">Vous avez choisi le paiement par Wave. Si vous n'avez pas encore finalisé votre règlement, vous pouvez utiliser notre lien Wave direct : <a href="https://pay.wave.com/m/M_sn_jgLTJQDWgtBq/c/sn/" target="_blank" style="color: #1dc3f5; text-decoration: underline;">Payer avec Wave</a>.</p>`
         } else if (paymentMethod === 'Orange Money') {
-          paymentInstruction = `<p style="color: #f16e00; font-weight: bold;">Paiement via Orange Money : Votre commande est en attente et ne sera validée qu'une fois le paiement (${order.subtotal} FCFA) reçu. Notre équipe va vous contacter au ${order.phone}.</p>`
+          paymentInstruction = `<p style="color: #f16e00; font-weight: bold;">Vous avez choisi le paiement par Orange Money. Notre équipe vous contactera au ${order.phone} ou sur WhatsApp au +221 77 477 20 51 pour finaliser le règlement.</p>`
         } else {
-          paymentInstruction = `<p>Votre commande est en attente de validation.</p>`
+          paymentInstruction = `<p>Votre commande a été prise en compte avec succès.</p>`
         }
 
         await resend.emails.send({
           from: 'DILYA Boutique <onboarding@resend.dev>',
           to: order.email,
-          subject: `Votre commande DILYA #${order.id.slice(-6).toUpperCase()} (En attente de paiement)`,
+          subject: 'Votre commande DILYA est confirmée ! 🎉',
           html: `
             <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-              <h1 style="color: #e2959c;">Commande enregistrée, ${order.firstName} !</h1>
-              <p>Nous avons bien reçu votre commande. Elle est actuellement <strong>en attente de votre paiement</strong>.</p>
+              <h1 style="color: #e2959c;">Merci pour votre commande, ${order.firstName} !</h1>
+              <p>Nous avons bien reçu votre commande et nous la préparons avec amour. 💕</p>
               
-              <div style="background-color: #fff8e6; border: 1px solid #fde68a; padding: 20px; border-radius: 12px; margin: 20px 0;">
-                <h3 style="margin-top: 0; color: #b45309;">⚠️ Validation de commande</h3>
-                <p style="margin-bottom: 10px;">Votre commande ne sera <strong>validée et préparée pour expédition</strong> qu'après confirmation de la réception effective de votre paiement.</p>
+              <div style="background-color: #f9f9f9; padding: 20px; border-radius: 12px; margin: 20px 0;">
+                <h3 style="margin-top: 0;">Informations importantes</h3>
                 ${paymentInstruction}
-                <p style="margin-top: 10px; font-weight: bold;">Montant total à régler : ${order.subtotal} FCFA</p>
+                <p><strong>Montant total à régler :</strong> ${order.subtotal} FCFA</p>
               </div>
 
-              <p>Dès confirmation du paiement par le propriétaire, vous recevrez une notification de confirmation.</p>
+              <p>Nous vous tiendrons informée de l'expédition de votre colis.</p>
               <br/>
               <p>Avec amour,</p>
               <p><strong>L'équipe DILYA</strong></p>

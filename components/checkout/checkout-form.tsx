@@ -167,14 +167,10 @@ export function CheckoutForm() {
                         <Image src="/orange-money.png" alt="Orange Money" width={28} height={28} className="rounded-md object-cover" />
                         <div>
                           <span className="font-medium text-sm">Orange Money</span>
-                          <p className="text-xs text-muted-foreground mt-0.5">Paiement mobile sécurisé</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">Transfert au +221 77 477 20 51 après validation</p>
                         </div>
                       </div>
                     </label>
-                  </div>
-
-                  <div className="mt-4 rounded-lg bg-amber-500/10 border border-amber-500/20 p-3 text-xs text-amber-800 dark:text-amber-200">
-                    <span className="font-semibold">⚠️ Condition de validation :</span> La commande restera <strong>en attente</strong> et ne sera validée et préparée qu'une fois la réception effective de votre paiement vérifiée.
                   </div>
                 </div>
                 
@@ -207,7 +203,7 @@ export function CheckoutForm() {
                     }
 
                     clear()
-                    toast.success("Commande enregistrée ! En attente de votre paiement pour validation.")
+                    toast.success("Commande enregistrée avec succès !")
 
                     if (paymentMethod === 'Wave') {
                       window.location.href = 'https://pay.wave.com/m/M_sn_jgLTJQDWgtBq/c/sn/'
