@@ -272,9 +272,9 @@ export function CheckoutForm() {
                     }
 
                     const total = subtotal
-                    clear()
                     setConfirmedTotal(total)
                     setOrderConfirmed(true)
+                    clear()
                   }}
                   disabled={isSubmitting}
                 >
