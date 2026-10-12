@@ -206,7 +206,7 @@ export function CheckoutForm() {
                     toast.success("Commande enregistrée avec succès !")
 
                     if (paymentMethod === 'Wave') {
-                      window.location.href = 'https://pay.wave.com/m/M_sn_jgLTJQDWgtBq/c/sn/'
+                      window.open('https://pay.wave.com/m/M_sn_jgLTJQDWgtBq/c/sn/', '_blank')
                     } else {
                       router.push('/')
                     }
