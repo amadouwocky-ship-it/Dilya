@@ -172,6 +172,10 @@ export function CheckoutForm() {
                       </div>
                     </label>
                   </div>
+
+                  <div className="mt-4 rounded-lg bg-amber-500/10 border border-amber-500/20 p-3 text-xs text-amber-800 dark:text-amber-200">
+                    <span className="font-semibold">⚠️ Condition de validation :</span> La commande restera <strong>en attente</strong> et ne sera validée et préparée qu'une fois la réception effective de votre paiement vérifiée.
+                  </div>
                 </div>
                 
                 <Button 
@@ -203,7 +207,7 @@ export function CheckoutForm() {
                     }
 
                     clear()
-                    toast.success("Commande enregistrée avec succès !")
+                    toast.success("Commande enregistrée ! En attente de votre paiement pour validation.")
 
                     if (paymentMethod === 'Wave') {
                       window.location.href = 'https://pay.wave.com/m/M_sn_jgLTJQDWgtBq/c/sn/'
