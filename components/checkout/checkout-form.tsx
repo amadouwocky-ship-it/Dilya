@@ -35,11 +35,15 @@ import { formatPrice } from '@/lib/format'
 import { COUNTRIES } from '@/lib/countries'
 import { createOrder } from '@/app/actions'
 
+const WAVE_URL = 'https://pay.wave.com/m/M_sn_jgLTJQDWgtBq/c/sn/'
+
 export function CheckoutForm() {
   const router = useRouter()
   const [selectedCountry, setSelectedCountry] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState('Wave')
+  const [orderConfirmed, setOrderConfirmed] = useState(false)
+  const [confirmedTotal, setConfirmedTotal] = useState(0)
   const { subtotal, items, clear } = useCart()
   
   const [formData, setFormData] = useState({
@@ -58,8 +62,73 @@ export function CheckoutForm() {
 
   const phonePrefix = COUNTRIES.find(c => c.code === selectedCountry)?.prefix || '+...'
 
-  if (items.length === 0) {
+  if (items.length === 0 && !orderConfirmed) {
     return null
+  }
+
+  // Wave payment confirmation screen
+  if (orderConfirmed && paymentMethod === 'Wave') {
+    return (
+      <div className="flex min-h-[70vh] flex-col items-center justify-center gap-6 px-4 text-center">
+        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#1dc3f5]/10">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+            <circle cx="20" cy="20" r="20" fill="#1dc3f5" opacity="0.15"/>
+            <path d="M12 21l6 6 10-12" stroke="#1dc3f5" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+        <div>
+          <h2 className="text-xl font-semibold">Commande enregistrée !</h2>
+          <p className="mt-2 text-sm text-muted-foreground max-w-sm">
+            Appuyez sur le bouton ci-dessous pour finaliser votre paiement de{' '}
+            <strong>{formatPrice(confirmedTotal)}</strong> via Wave.
+          </p>
+        </div>
+        <a
+          href={WAVE_URL}
+          className="flex items-center gap-3 rounded-xl bg-[#1dc3f5] px-8 py-4 font-semibold text-white text-base shadow-lg active:scale-95 transition-transform"
+        >
+          <svg width="22" height="22" viewBox="0 0 32 32" fill="white">
+            <rect width="32" height="32" rx="8" fill="white" fillOpacity="0.2"/>
+            <path d="M8 16c0-4.4 3.6-8 8-8s8 3.6 8 8-3.6 8-8 8-8-3.6-8-8zm8-5l-1.4 1.4L17 15H11v2h6l-2.4 2.6L16 21l5-5-5-5z" fill="white"/>
+          </svg>
+          Payer avec Wave
+        </a>
+        <button
+          onClick={() => router.push('/')}
+          className="text-sm text-muted-foreground underline underline-offset-2"
+        >
+          Retour à l'accueil
+        </button>
+      </div>
+    )
+  }
+
+  // Orange Money confirmation
+  if (orderConfirmed && paymentMethod === 'Orange Money') {
+    return (
+      <div className="flex min-h-[70vh] flex-col items-center justify-center gap-6 px-4 text-center">
+        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#f16e00]/10">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+            <circle cx="20" cy="20" r="20" fill="#f16e00" opacity="0.15"/>
+            <path d="M12 21l6 6 10-12" stroke="#f16e00" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+        <div>
+          <h2 className="text-xl font-semibold">Commande confirmée !</h2>
+          <p className="mt-2 text-sm text-muted-foreground max-w-sm">
+            Envoyez <strong>{formatPrice(confirmedTotal)}</strong> via Orange Money au numéro :
+          </p>
+          <p className="mt-3 text-2xl font-bold tracking-widest text-[#f16e00]">+221 77 477 20 51</p>
+          <p className="mt-2 text-xs text-muted-foreground">Mentionnez votre nom en objet du transfert.</p>
+        </div>
+        <button
+          onClick={() => router.push('/')}
+          className="rounded-xl bg-[#f16e00] px-8 py-4 font-semibold text-white text-base shadow-lg"
+        >
+          Retour à l'accueil
+        </button>
+      </div>
+    )
   }
 
   return (
@@ -202,14 +271,10 @@ export function CheckoutForm() {
                       return
                     }
 
+                    const total = subtotal
                     clear()
-                    toast.success("Commande enregistrée avec succès !")
-
-                    if (paymentMethod === 'Wave') {
-                      window.open('https://pay.wave.com/m/M_sn_jgLTJQDWgtBq/c/sn/', '_blank')
-                    } else {
-                      router.push('/')
-                    }
+                    setConfirmedTotal(total)
+                    setOrderConfirmed(true)
                   }}
                   disabled={isSubmitting}
                 >
