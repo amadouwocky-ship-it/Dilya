@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { formatPrice } from '@/lib/format'
 import Image from 'next/image'
-import { ChevronLeft, MapPin, User, Package, Calendar, AlertTriangle } from 'lucide-react'
+import { ChevronLeft, MapPin, User, Package, Calendar } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { OrderStatusUpdater } from '@/components/admin/order-status-updater'
@@ -51,18 +51,6 @@ export default async function OrderDetailsPage({ params }: { params: Promise<{ i
         
         <OrderStatusUpdater orderId={order.id} currentStatus={order.status} />
       </div>
-
-      {order.status === 'PENDING' && (
-        <div className="mb-6 rounded-lg bg-amber-500/10 border border-amber-500/30 p-4 text-sm text-amber-900 dark:text-amber-200 flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-          <div>
-            <p className="font-semibold">Paiement en attente de vérification</p>
-            <p className="mt-0.5 text-xs text-amber-800 dark:text-amber-300">
-              Vérifiez la réception effective de <strong>{formatPrice(order.subtotal)}</strong> sur votre compte Wave Business ou Orange Money avant de valider la commande en passant le statut à <strong>« Confirmée »</strong>.
-            </p>
-          </div>
-        </div>
-      )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Colonne gauche : Articles */}

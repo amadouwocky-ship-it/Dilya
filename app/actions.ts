@@ -163,32 +163,38 @@ export async function deleteCategory(id: string) {
 }
 
 async function uniqueProductSlug(base: string, excludeId: string | null) {
-  const normalized = slugify(base)
+  const normalized = slugify(base || 'produit')
+
   for (let n = 0; n < 50; n++) {
     const candidate = n === 0 ? normalized : `${normalized}-${n + 1}`
     const existing = await prisma.product.findUnique({
       where: { slug: candidate },
       select: { id: true },
     })
+
     if (!existing || existing.id === excludeId) return candidate
   }
-  return `${normalized}-${Date.now().toString(36)}`
+
+  return `${normalized}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
 }
 
 export async function saveProduct(id: string | null, data: any) {
-  try {
-    const images: string[] = Array.isArray(data.images) ? data.images : []
-    const informations: string[] = Array.isArray(data.informations) ? data.informations : []
-    const name = String(data.name ?? '').trim()
-    if (!name) {
-      return { error: 'Le nom du produit est obligatoire.' }
-    }
-    if (!data.categoryId) {
-      return { error: 'La catégorie est obligatoire.' }
-    }
+  const images: string[] = Array.isArray(data.images) ? data.images : []
+  const informations: string[] = Array.isArray(data.informations) ? data.informations : []
+  const name = String(data.name ?? '').trim()
 
-    const slug = await uniqueProductSlug(data.slug || name, id)
+  if (!name) {
+    return { error: 'Le nom du produit est obligatoire.' }
+  }
 
+  if (!data.categoryId) {
+    return { error: 'La catégorie est obligatoire.' }
+  }
+
+  const baseSlug = String(data.slug ?? name).trim()
+  const initialSlug = slugify(baseSlug || name)
+
+  const saveWithSlug = async (slug: string) => {
     const productData = {
       name,
       slug,
@@ -235,13 +241,31 @@ export async function saveProduct(id: string | null, data: any) {
         },
       })
     }
+  }
+
+  try {
+    const slug = await uniqueProductSlug(initialSlug, id)
+    await saveWithSlug(slug)
     revalidatePath('/', 'layout')
     return { success: true }
   } catch (err: unknown) {
     console.error('Error saving product:', err)
+
     if (isDuplicateSlugError(err)) {
-      return { error: 'Un produit avec cette URL (slug) existe déjà. Changez le nom ou le slug, puis réessayez.' }
+      try {
+        const retrySlug = await uniqueProductSlug(`${initialSlug}-${Date.now().toString(36)}`, id)
+        await saveWithSlug(retrySlug)
+        revalidatePath('/', 'layout')
+        return { success: true }
+      } catch (retryError) {
+        console.error('Retry slug save failed:', retryError)
+      }
+
+      return {
+        error: 'Ce nom/URL est déjà utilisé. Merci de modifier le nom ou le slug du produit pour continuer.',
+      }
     }
+
     return { error: 'Erreur lors de la sauvegarde du produit.' }
   }
 }
