@@ -195,9 +195,9 @@ export async function saveProduct(id: string | null, data: any) {
     }
     revalidatePath('/', 'layout')
     return { success: true }
-  } catch (err) {
+  } catch (err: any) {
     console.error('Error saving product:', err)
-    return { error: 'Erreur lors de la sauvegarde du produit.' }
+    return { error: err?.message || 'Erreur lors de la sauvegarde du produit.' }
   }
 }
 
