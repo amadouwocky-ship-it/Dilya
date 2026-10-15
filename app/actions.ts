@@ -2,6 +2,7 @@
 
 import { searchProducts, getCategories } from '@/lib/products'
 import { prisma } from '@/lib/db'
+import { isDuplicateSlugError, slugify } from '@/lib/slug'
 import { revalidatePath } from 'next/cache'
 import { Resend } from 'resend'
 import { cookies } from 'next/headers'
@@ -161,10 +162,51 @@ export async function deleteCategory(id: string) {
   }
 }
 
+async function uniqueProductSlug(base: string, excludeId: string | null) {
+  const normalized = slugify(base)
+  for (let n = 0; n < 50; n++) {
+    const candidate = n === 0 ? normalized : `${normalized}-${n + 1}`
+    const existing = await prisma.product.findUnique({
+      where: { slug: candidate },
+      select: { id: true },
+    })
+    if (!existing || existing.id === excludeId) return candidate
+  }
+  return `${normalized}-${Date.now().toString(36)}`
+}
+
 export async function saveProduct(id: string | null, data: any) {
   try {
-    const { images, informations, ...productData } = data
-    
+    const images: string[] = Array.isArray(data.images) ? data.images : []
+    const informations: string[] = Array.isArray(data.informations) ? data.informations : []
+    const name = String(data.name ?? '').trim()
+    if (!name) {
+      return { error: 'Le nom du produit est obligatoire.' }
+    }
+    if (!data.categoryId) {
+      return { error: 'La catégorie est obligatoire.' }
+    }
+
+    const slug = await uniqueProductSlug(data.slug || name, id)
+
+    const productData = {
+      name,
+      slug,
+      categoryId: data.categoryId,
+      price: Number(data.price) || 0,
+      oldPrice:
+        data.oldPrice !== null && data.oldPrice !== undefined && data.oldPrice !== ''
+          ? Number(data.oldPrice)
+          : null,
+      isNew: Boolean(data.isNew),
+      inStock: Boolean(data.inStock),
+      stock: Number(data.stock) || 0,
+      shortDescription: String(data.shortDescription ?? ''),
+      description: String(data.description ?? ''),
+      sizes: data.sizes ?? null,
+      colors: data.colors ?? null,
+    }
+
     if (id) {
       await prisma.product.update({
         where: { id },
@@ -172,32 +214,35 @@ export async function saveProduct(id: string | null, data: any) {
           ...productData,
           images: {
             deleteMany: {},
-            create: images.map((url: string, index: number) => ({ url, position: index }))
+            create: images.map((url: string, index: number) => ({ url, position: index })),
           },
           informations: {
             deleteMany: {},
-            create: informations.map((value: string, index: number) => ({ value, position: index }))
-          }
-        }
+            create: informations.map((value: string, index: number) => ({ value, position: index })),
+          },
+        },
       })
     } else {
       await prisma.product.create({
         data: {
           ...productData,
           images: {
-            create: images.map((url: string, index: number) => ({ url, position: index }))
+            create: images.map((url: string, index: number) => ({ url, position: index })),
           },
           informations: {
-            create: informations.map((value: string, index: number) => ({ value, position: index }))
-          }
-        }
+            create: informations.map((value: string, index: number) => ({ value, position: index })),
+          },
+        },
       })
     }
     revalidatePath('/', 'layout')
     return { success: true }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Error saving product:', err)
-    return { error: err?.message || 'Erreur lors de la sauvegarde du produit.' }
+    if (isDuplicateSlugError(err)) {
+      return { error: 'Un produit avec cette URL (slug) existe déjà. Changez le nom ou le slug, puis réessayez.' }
+    }
+    return { error: 'Erreur lors de la sauvegarde du produit.' }
   }
 }
 

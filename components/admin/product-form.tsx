@@ -13,6 +13,7 @@ import { toast } from 'sonner'
 import { Loader2, Trash2, Plus, X } from 'lucide-react'
 
 import { ImageUpload } from '@/components/admin/image-upload'
+import { slugify } from '@/lib/slug'
 
 interface ProductFormProps {
   categories: { id: string, name: string }[]
@@ -63,7 +64,7 @@ export function ProductForm({ categories, initialData }: ProductFormProps) {
       ...prev,
       name: newName,
       ...(!initialData && {
-        slug: newName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')
+        slug: slugify(newName)
       })
     }))
   }
@@ -97,6 +98,7 @@ export function ProductForm({ categories, initialData }: ProductFormProps) {
     // Format data for Prisma
     const dataToSave = {
       ...formData,
+      slug: slugify(formData.slug || formData.name),
       price: Number(formData.price),
       oldPrice: formData.oldPrice ? Number(formData.oldPrice) : null,
       stock: Number(formData.stock),

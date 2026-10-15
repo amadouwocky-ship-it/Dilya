@@ -10,6 +10,7 @@ import { saveCategory, deleteCategory } from '@/app/actions'
 import { toast } from 'sonner'
 import { Loader2, Trash2 } from 'lucide-react'
 import { ImageUpload } from '@/components/admin/image-upload'
+import { slugify } from '@/lib/slug'
 
 interface CategoryFormProps {
   initialData?: {
@@ -41,7 +42,7 @@ export function CategoryForm({ initialData }: CategoryFormProps) {
       name: newName,
       // Only auto-update slug if we are creating new (no initialData)
       ...(!initialData && {
-        slug: newName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '')
+        slug: slugify(newName)
       })
     }))
   }
